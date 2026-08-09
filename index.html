@@ -24,7 +24,7 @@ body {
   background: var(--bg0); color: var(--txt);
   font-family: var(--sans);
   font-size: 15px; line-height: 1.5;
-  overflow-x: hidden; padding-bottom: 24px;
+  overflow-x: hidden; padding: 78px 0 24px;
   -webkit-user-select: none; user-select: none;
 }
 body::before {
@@ -36,13 +36,24 @@ body::before {
 button { font-family: inherit; cursor: pointer; color: inherit; background: none; border: none; user-select: none; }
 input { font-family: inherit; }
 
-/* ===== TRANSPORT ===== */
-.transport-wrapper { position: sticky; top: 0; z-index: 100; background: rgba(6, 18, 11, 0.96); border-bottom: 1px solid var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
+/* ===== FIXED TRANSPORT (always visible) ===== */
+.transport-wrapper { position: fixed; top: 0; left: 0; right: 0; z-index: 100; background: rgba(6, 18, 11, 0.97); border-bottom: 1px solid var(--line); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); }
 .transport-scroll { overflow-x: auto; overflow-y: hidden; -webkit-overflow-scrolling: touch; padding: 0 8px; }
 .transport-scroll::-webkit-scrollbar { height: 3px; }
 .transport-scroll::-webkit-scrollbar-thumb { background: var(--gold); border-radius: 2px; }
 .transport-bar { display: flex; align-items: center; gap: 8px; padding: 10px 6px; min-width: max-content; }
 .brand-mini { font-family: var(--disp); font-weight: 900; font-size: 0.72rem; color: var(--gold); letter-spacing: 0.05em; white-space: nowrap; padding: 0 8px; }
+.ctx-chip {
+  font-family: var(--mono); font-size: 0.66rem; font-weight: 800; letter-spacing: 0.08em;
+  height: 44px; display: flex; align-items: center; padding: 0 12px;
+  background: var(--panel2); border: 1px solid var(--mg); color: var(--mg);
+  border-radius: 8px; white-space: nowrap; flex-shrink: 0;
+  animation: ctxflash 0.4s ease;
+}
+@keyframes ctxflash { 0% { transform: scale(1.12); } 100% { transform: scale(1); } }
+.ctx-chip[data-ctx="mixer"] { border-color: var(--cy); color: var(--cy); }
+.ctx-chip[data-ctx="session"] { border-color: var(--lm); color: var(--lm); }
+.ctx-chip[data-ctx="vault"] { border-color: var(--gold); color: var(--gold); }
 .tbtn { font-family: var(--mono); font-weight: 700; width: 44px; height: 44px; border-radius: 10px; background: var(--panel); border: 1px solid var(--line2); color: var(--txt); display: grid; place-items: center; transition: all 0.15s; flex-shrink: 0; font-size: 0.95rem; }
 .tbtn:active { transform: scale(0.92); }
 .tbtn.active { background: var(--cy); color: #04170c; border-color: var(--cy); box-shadow: 0 0 14px rgba(74,222,128,0.5); }
@@ -83,6 +94,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .layer-item.active { border-color: var(--mg); background: rgba(34, 197, 94, 0.07); }
 .layer-item.active-recording { border-color: var(--mg); background: rgba(34, 197, 94, 0.1); animation: record-pulse 1.5s infinite; }
 @keyframes record-pulse { 0%,100% { box-shadow: 0 0 0 2px rgba(34,197,94,0.3); } 50% { box-shadow: 0 0 0 4px rgba(34,197,94,0.55); } }
+.layer-item.selmarked-row { border-color: var(--mg); box-shadow: 0 0 0 2px rgba(34,197,94,0.5); }
 .layer-checkbox { width: 26px; height: 26px; border-radius: 5px; border: 2px solid var(--line2); background: var(--panel); display: grid; place-items: center; flex-shrink: 0; font-size: 0.9rem; color: transparent; font-weight: 900; transition: all 0.15s; }
 .layer-item.selected .layer-checkbox { background: var(--lm); border-color: var(--lm); color: #0c1a02; }
 .layer-color { width: 12px; height: 12px; border-radius: 3px; flex-shrink: 0; }
@@ -174,7 +186,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .rec-session-btn.recording { background: linear-gradient(135deg, var(--mg), #0e9f4e); color: #fff; animation: pulse 1.2s infinite; }
 .rec-elapsed { font-family: var(--mono); font-size: 0.8rem; font-weight: 800; color: var(--mg); }
 
-/* ===== MIXER EDITOR ===== */
+/* ===== MIXER ===== */
 .mix-controls { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; background: var(--panel2); border: 1px solid var(--line2); border-radius: 8px; padding: 8px; margin-bottom: 8px; font-family: var(--mono); }
 .mc-label { font-size: 0.68rem; font-weight: 800; color: var(--cy); padding: 0 6px; max-width: 130px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .mc-group { display: flex; align-items: center; gap: 4px; background: var(--panel); border: 1px solid var(--line); border-radius: 6px; padding: 3px 6px; }
@@ -195,6 +207,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .mix-clip span { font-size: 0.6rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .mix-clip em { font-style: normal; font-size: 0.52rem; font-weight: 700; opacity: 0.75; }
 .mix-clip.selclip { box-shadow: 0 0 0 3px var(--cy), 0 0 14px rgba(74, 222, 128, 0.6); }
+.mix-clip.selmarked { box-shadow: 0 0 0 3px var(--mg), 0 0 12px rgba(34, 197, 94, 0.6); }
 .rz { position: absolute; top: 0; bottom: 0; width: 14px; touch-action: none; cursor: ew-resize; z-index: 4; }
 .rz-l { left: 0; border-radius: 5px 0 0 5px; background: linear-gradient(90deg, rgba(0,0,0,0.4), transparent); }
 .rz-r { right: 0; border-radius: 0 5px 5px 0; background: linear-gradient(270deg, rgba(0,0,0,0.4), transparent); }
@@ -243,8 +256,9 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
   <div class="transport-scroll">
     <div class="transport-bar">
       <span class="brand-mini">◆ ROBOT BEATS MAKINGS</span>
-      <button class="tbtn" id="playBtn" title="Play">▶</button>
-      <button class="tbtn" id="stopBtn" title="Stop">⏹</button>
+      <span class="ctx-chip" id="ctxChip" data-ctx="beats">● BEATS EDITOR</span>
+      <button class="tbtn" id="playBtn" title="Play (context aware)">▶</button>
+      <button class="tbtn" id="stopBtn" title="Stop all">⏹</button>
       <button class="tbtn play-sel" id="playSelectedBtn">▶ SELECTED</button>
       <div class="ctl-group">
         <input type="number" id="bpmInput" value="120" min="40" max="240">
@@ -256,15 +270,17 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
         <button class="spd-btn" id="speedUpBtn">+</button>
         <span class="lbl">SPEED</span>
       </div>
-      <button class="tbtn loop on" id="loopBtn" title="Loop">↻</button>
-      <button class="tbtn delete-mode" id="deleteModeBtn" title="Tap-to-delete mode">🗑</button>
+      <button class="tbtn loop on" id="loopBtn" title="Loop (context aware)">↻</button>
+      <button class="tbtn delete-mode" id="deleteModeBtn" title="Delete mode (context aware)">🗑</button>
+      <button class="tbtn" id="selectBeatsBtn" title="Select mode (context aware)">✂</button>
+      <button class="tbtn" id="deleteSelectedBtn" title="Remove selected">🗑✕</button>
       <button class="tbtn download" id="downloadBtn">⭳ WAV</button>
     </div>
   </div>
 </header>
 
 <main>
-  <section class="section">
+  <section class="section" data-ctx="beats">
     <div class="section-header">
       <h2>◆ SOUND TYPES</h2>
       <span class="layer-pos" id="currentInstLabel">IVORY</span>
@@ -272,7 +288,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     <div class="instrument-scroll" id="instrumentScroll"></div>
   </section>
 
-  <section class="section">
+  <section class="section" data-ctx="beats">
     <div class="section-header">
       <h2>◆ LAYERS</h2>
       <div class="header-actions">
@@ -287,11 +303,11 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
     <div class="rec-hint">
       <b>✓</b> select layer → beats record INTO it + it plays · tap row = REC target ·
-      <b>✂ SELECT BEATS</b> → tap beats → <b>REMOVE</b> · recorded sessions remix in the <b>DRAG & DROP MIXER</b> below.
+      <b>✂</b> in the top bar marks beats here · top-bar buttons follow the <b>● context chip</b>.
     </div>
   </section>
 
-  <section class="section" style="padding: 10px;">
+  <section class="section" data-ctx="beats" style="padding: 10px;">
     <div class="section-header">
       <h2>◆ KEYBOARD SYSTEM</h2>
       <span class="layer-pos" id="octaveLabel">1 UNIT</span>
@@ -322,13 +338,10 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
   </section>
 
-  <section class="section" style="padding: 10px;">
+  <section class="section" data-ctx="beats" style="padding: 10px;">
     <div class="section-header">
       <h2>◆ BEAT TIMELINE</h2>
-      <div class="header-actions">
-        <button class="mini-btn" id="selectBeatsBtn">✂ SELECT BEATS</button>
-        <button class="mini-btn danger" id="deleteSelectedBtn">🗑 REMOVE (0)</button>
-      </div>
+      <span class="layer-pos" id="beatCountLabel">0 NOTES</span>
     </div>
     <div class="timeline-wrapper">
       <div class="mode-overlay" id="modeOverlay"></div>
@@ -343,7 +356,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" data-ctx="session">
     <div class="section-header">
       <h2>◆ SESSION RECORDER</h2>
       <span class="rec-elapsed" id="recElapsed">0:00.0</span>
@@ -352,7 +365,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     <div class="layer-list" id="trackList" style="margin-top: 10px;"></div>
   </section>
 
-  <section class="section">
+  <section class="section" data-ctx="mixer">
     <div class="section-header">
       <h2>◆ MIXER — DRAG · RESIZE · REMIX</h2>
       <div class="header-actions">
@@ -373,12 +386,11 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
     <button class="mix-play-btn" id="mixPlayBtn">▶ PLAY MIX — from gold cursor</button>
     <div class="rec-hint">
-      <b>DRAG</b> clip body = move · <b>EDGES</b> = resize/trim · <b>TAP clip</b> = SPEED / VOLUME / nudge / dup / delete ·
-      <b>↻ REPEAT</b> = endless loop · <b>⭳ SAVE MIX</b> = prints the edited mix to your phone (MP3/AAC) + Produced panel.
+      <b>DRAG</b> clip = move · <b>EDGES</b> = resize · <b>TAP</b> = controls · top-bar <b>✂ / 🗑 /  / SPEED / ▶</b> all act on the MIXER when the chip shows <b>● MIXER</b>.
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" data-ctx="vault">
     <div class="section-header">
       <h2>◆ PRODUCED MIXES & PROJECT VAULT</h2>
     </div>
@@ -394,12 +406,11 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
     <input type="file" id="projFile" accept=".rbm,.json,application/json" style="display:none">
     <div class="rec-hint">
-      Mixes print to your phone <b>Download</b> folder AND stay in the studio vault (safe offline storage on this device).
-      <b>SAVE PROJECT</b> stores the whole studio (layers + sessions + mixer) offline — <b>LOAD</b> it back anytime, even with no internet.
+      Mixes print as <b>.mp3</b> to Downloads + vault · projects load offline · top bar chip <b>● VAULT</b> makes ▶ play your latest mix.
     </div>
   </section>
 
-  <section class="section">
+  <section class="section" data-ctx="beats">
     <div class="bottom-controls">
       <button class="action-btn danger" id="clearLayerBtn">CLEAR ACTIVE LAYER</button>
       <button class="action-btn primary" id="downloadBtn2">⭳ DOWNLOAD WAV</button>
@@ -443,6 +454,10 @@ const state = {
   sizeMode: 'small', zoomLevel: 2, pxPerColumn: 48,
   scheduledNotes: new Map(),
   selectedNoteIds: new Set(),
+  selectedClipIds: new Set(),
+  selectedTrackIds: new Set(),
+  selectedVaultIds: new Set(),
+  miscLoop: false, miscRate: 1,
   session: { recording: false, start: 0, events: [], timer: null },
   tracks: [], nextTrackId: 1,
   mixer: {
@@ -455,6 +470,7 @@ const state = {
     repeat: true,
   },
 };
+let uiContext = 'beats';
 const SPEEDS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 const ZOOM_LEVELS = [
   { name: '50%', px: 24 }, { name: '75%', px: 36 }, { name: '100%', px: 48 },
@@ -822,6 +838,46 @@ function playSound(instrument, midi, note, duration = 0.5, targetCtx = null, off
   if (instruments[instrument]) instruments[instrument](c, time, midi, note, duration, d, rv, noiseBuffer);
 }
 
+/* ============ CONTEXT SYSTEM (layout awareness) ============ */
+function setContext(c) {
+  if (uiContext === c) return;
+  uiContext = c;
+  updateCtxChip();
+  refreshTransport();
+}
+function updateCtxChip() {
+  const map = { beats: '● BEATS EDITOR', mixer: '● MIXER', session: '● SESSION', vault: '● VAULT' };
+  const el = $('ctxChip');
+  el.textContent = map[uiContext] || map.beats;
+  el.dataset.ctx = uiContext;
+}
+function detectContext() {
+  const mid = window.innerHeight * 0.35;
+  let cur = 'beats';
+  document.querySelectorAll('section[data-ctx]').forEach(s => {
+    const r = s.getBoundingClientRect();
+    if (r.top <= mid) cur = s.dataset.ctx;
+  });
+  setContext(cur);
+}
+function contextPlaying() {
+  if (uiContext === 'beats') return state.isPlaying;
+  if (uiContext === 'mixer') return mixerPlay.active;
+  if (uiContext === 'session') return trackPlay.active;
+  return !!(vaultAudio && !vaultAudio.paused);
+}
+function refreshTransport() {
+  $('playBtn').textContent = contextPlaying() ? '❚❚' : '▶';
+  const lp = uiContext === 'beats' ? state.isLooping : uiContext === 'mixer' ? state.mixer.repeat : state.miscLoop;
+  $('loopBtn').classList.toggle('on', lp);
+  let sv;
+  if (uiContext === 'beats') sv = state.playbackSpeed;
+  else if (uiContext === 'mixer') { const c = getSelectedClip(); sv = c ? c.rate : null; }
+  else sv = state.miscRate;
+  $('speedLabel').textContent = sv == null ? '—' : sv + '×';
+  updateDeleteSelectedLabel();
+}
+
 /* ============ KEYS ============ */
 function getKeyAtColumn(col) {
   const unitIdx = Math.floor(col / KEYS_PER_UNIT);
@@ -1135,8 +1191,17 @@ function renderTimeline() {
     row.appendChild(cells);
     tl.appendChild(row);
   });
+  const totalNotes = state.layers.reduce((s, l) => s + l.notes.length, 0);
+  $('beatCountLabel').textContent = `${totalNotes} NOTES`;
 }
-function updateDeleteSelectedLabel() { $('deleteSelectedBtn').textContent = `🗑 REMOVE (${state.selectedNoteIds.size})`; }
+function updateDeleteSelectedLabel() {
+  let n = 0;
+  if (uiContext === 'mixer') n = state.selectedClipIds.size;
+  else if (uiContext === 'session') n = state.selectedTrackIds.size;
+  else if (uiContext === 'vault') n = state.selectedVaultIds.size;
+  else n = state.selectedNoteIds.size;
+  $('deleteSelectedBtn').textContent = `🗑✕(${n})`;
+}
 function shadeColor(color, percent) {
   const f = parseInt(color.slice(1), 16);
   const t = percent < 0 ? 0 : 255;
@@ -1162,13 +1227,14 @@ function updateInfoLabels() {
 /* ============ LAYER PLAYBACK ============ */
 function startPlayback(fromPos = 0, layerIds = null) {
   initAudio(); resumeCtx();
-  stopTrack(); stopMixer();
+  stopTrack(); stopMixer(); stopVault();
   state.isPlaying = true;
   state.playingLayerIds = layerIds;
   state.playbackPos = fromPos;
   state.playbackStartTime = ctx.currentTime - (fromPos * getBeatDur());
   $('playBtn').classList.add('active');
   playbackLoop();
+  refreshTransport();
 }
 function stopPlayback() {
   state.isPlaying = false;
@@ -1177,8 +1243,9 @@ function stopPlayback() {
   $('playBtn').classList.remove('active');
   clearPlayhead();
   if (state.playbackRAF) cancelAnimationFrame(state.playbackRAF);
+  refreshTransport();
 }
-function stopAllPlayback() { stopPlayback(); stopTrack(); stopMixer(); }
+function stopAllPlayback() { stopPlayback(); stopTrack(); stopMixer(); stopVault(); }
 function clearPlayhead() { document.querySelectorAll('.timeline-cell.playhead').forEach(c => c.classList.remove('playhead')); }
 function getPlayingLayers() {
   if (state.playingLayerIds) return state.layers.filter(l => state.playingLayerIds.includes(l.id) && !l.muted);
@@ -1268,7 +1335,7 @@ function renderTracks() {
   if (state.tracks.length === 0) { list.innerHTML = '<div class="empty-state">// NO TRACKS YET — HIT RECORD & PLAY</div>'; return; }
   state.tracks.forEach(tr => {
     const item = document.createElement('div');
-    item.className = 'layer-item';
+    item.className = 'layer-item' + (state.selectedTrackIds.has(tr.id) ? ' selmarked-row' : '');
     item.dataset.trackRow = tr.id;
     item.innerHTML = `
       <button class="layer-btn play-layer" data-t="play" data-id="${tr.id}">▶</button>
@@ -1277,6 +1344,23 @@ function renderTracks() {
       <button class="layer-btn mixadd" data-t="mix" data-id="${tr.id}" title="Drop into mixer at cursor">＋</button>
       <button class="layer-btn" data-t="dl" data-id="${tr.id}">⭳</button>
       <button class="layer-btn delete" data-t="del" data-id="${tr.id}">🗑</button>`;
+    item.addEventListener('click', (e) => {
+      if (e.target.closest('[data-t]')) return;
+      if (state.deleteMode) {
+        showModal({ title: `Delete track "${tr.name}"?`, okText: 'DELETE', onOk: () => {
+          state.tracks = state.tracks.filter(t => t.id !== tr.id);
+          state.mixer.clips = state.mixer.clips.filter(c => c.trackId !== tr.id);
+          state.selectedTrackIds.delete(tr.id);
+          renderTracks(); renderMixerEditor();
+          toast('Track deleted', 'error');
+        }});
+      } else if (state.selectMode) {
+        if (state.selectedTrackIds.has(tr.id)) state.selectedTrackIds.delete(tr.id);
+        else state.selectedTrackIds.add(tr.id);
+        item.classList.toggle('selmarked-row');
+        updateDeleteSelectedLabel();
+      }
+    });
     list.appendChild(item);
   });
   list.querySelectorAll('[data-t]').forEach(el => {
@@ -1308,31 +1392,44 @@ function renderTracks() {
     });
   });
 }
-let trackPlay = { active: false, track: null, start: 0, raf: null };
+let trackPlay = { active: false, track: null, lastT: 0, pos: 0, rate: 1, raf: null };
 function playTrack(tr) {
   initAudio(); resumeCtx();
-  stopPlayback(); stopTrack(); stopMixer();
+  stopPlayback(); stopTrack(); stopMixer(); stopVault();
   tr.events.forEach(e => delete e._p);
-  trackPlay = { active: true, track: tr, start: ctx.currentTime + 0.1, raf: null };
+  trackPlay = { active: true, track: tr, lastT: ctx.currentTime, pos: 0, rate: state.miscRate, raf: null };
   toast(`▶ ${tr.name} — as you played it`, 'success');
   trackLoop();
+  refreshTransport();
 }
 function trackLoop() {
   if (!trackPlay.active) return;
-  const now = ctx.currentTime, el = now - trackPlay.start, tr = trackPlay.track;
+  const now = ctx.currentTime;
+  const dt = Math.max(0, now - trackPlay.lastT);
+  trackPlay.lastT = now;
+  trackPlay.pos += dt * trackPlay.rate;
+  const el = trackPlay.pos;
+  const tr = trackPlay.track;
   tr.events.forEach(ev => {
     if (ev._p) return;
     if (ev.t <= el + 0.25) {
       ev._p = true;
-      if (ev.t >= el - 0.1) playSound(ev.instrument, ev.midi, ev.note, ev.dur, ctx, Math.max(0, trackPlay.start + ev.t - now));
+      if (ev.t >= el - 0.1) playSound(ev.instrument, ev.midi, ev.note, ev.dur, ctx, Math.max(0, (ev.t - el) / trackPlay.rate));
     }
   });
   const row = document.querySelector(`[data-track-row="${tr.id}"] .layer-pos`);
   if (row) row.textContent = `${fmtTime(Math.max(0, el))} / ${fmtTime(tr.duration)}`;
-  if (el > tr.duration + 0.3) { stopTrack(); renderTracks(); }
+  if (el > tr.duration + 0.3) {
+    if (state.miscLoop) { tr.events.forEach(e => delete e._p); trackPlay.pos = 0; }
+    else { stopTrack(); renderTracks(); }
+  }
   else trackPlay.raf = requestAnimationFrame(trackLoop);
 }
-function stopTrack() { if (trackPlay.raf) cancelAnimationFrame(trackPlay.raf); trackPlay.active = false; }
+function stopTrack() {
+  if (trackPlay.raf) cancelAnimationFrame(trackPlay.raf);
+  trackPlay.active = false;
+  refreshTransport();
+}
 async function downloadTrack(tr) {
   toast(`Rendering "${tr.name}"...`, 'success');
   const sr = 44100, dur = tr.duration + 1.5;
@@ -1394,6 +1491,7 @@ function addClip(trackId) {
 function selectClip(id) {
   state.mixer.selectedClipId = id;
   renderMixerEditor(); renderMixerControls();
+  refreshTransport();
 }
 function renderMixerLayers() {
   const list = $('mixLayerList');
@@ -1491,10 +1589,11 @@ function renderMixerControls() {
       else if (a === 'del') {
         state.mixer.clips = state.mixer.clips.filter(x => x.id !== c.id);
         state.mixer.selectedClipId = null;
+        state.selectedClipIds.delete(c.id);
         toast('Clip removed', 'error');
       }
       else if (a === 'close') { state.mixer.selectedClipId = null; }
-      renderMixerEditor(); renderMixerControls();
+      renderMixerEditor(); renderMixerControls(); refreshTransport();
     });
   });
 }
@@ -1563,7 +1662,7 @@ function renderMixerEditor() {
     if (!cont) return;
     const { ln } = clipSrc(clip, tr);
     const el = document.createElement('div');
-    el.className = 'mix-clip' + (state.mixer.selectedClipId === clip.id ? ' selclip' : '');
+    el.className = 'mix-clip' + (state.mixer.selectedClipId === clip.id ? ' selclip' : '') + (state.selectedClipIds.has(clip.id) ? ' selmarked' : '');
     el.style.left = (clip.start * px) + 'px';
     el.style.width = Math.max(26, (ln / clip.rate) * px - 2) + 'px';
     el.style.background = `linear-gradient(135deg, ${layers[li].color}, ${shadeColor(layers[li].color, -25)})`;
@@ -1613,7 +1712,20 @@ function attachClipDrag(el, clip) {
       el.removeEventListener('pointermove', move);
       el.removeEventListener('pointerup', up);
       el.removeEventListener('pointercancel', up);
-      if (!moved) selectClip(clip.id);
+      if (!moved) {
+        if (state.deleteMode) {
+          state.mixer.clips = state.mixer.clips.filter(x => x.id !== clip.id);
+          if (state.mixer.selectedClipId === clip.id) state.mixer.selectedClipId = null;
+          state.selectedClipIds.delete(clip.id);
+          renderMixerEditor(); renderMixerControls();
+          toast('Clip deleted', 'error');
+        } else if (state.selectMode) {
+          if (state.selectedClipIds.has(clip.id)) state.selectedClipIds.delete(clip.id);
+          else state.selectedClipIds.add(clip.id);
+          renderMixerEditor();
+          updateDeleteSelectedLabel();
+        } else selectClip(clip.id);
+      }
       else { renderMixerEditor(); renderMixerControls(); toast(`◧ clip @ ${clip.start}s`, 'success'); }
     };
     el.addEventListener('pointermove', move);
@@ -1659,7 +1771,7 @@ function attachClipResize(el, clip, side) {
       h.removeEventListener('pointermove', move);
       h.removeEventListener('pointerup', up);
       h.removeEventListener('pointercancel', up);
-      renderMixerEditor(); renderMixerControls();
+      renderMixerEditor(); renderMixerControls(); refreshTransport();
       toast(side === 'l' ? `◧ left-trim · starts +${(clip.srcOffset || 0).toFixed(1)}s · len ${clip.len.toFixed(1)}s` : `◨ length ${clip.len.toFixed(1)}s`, 'success');
     };
     h.addEventListener('pointermove', move);
@@ -1691,6 +1803,7 @@ function playMixer() {
   $('mixPlayBtn').textContent = '■ STOP MIX';
   toast(`▶ MIX from ${state.mixer.insertPos}s — ${pairs.length} clip(s)${state.mixer.repeat ? ' · REPEAT ∞' : ''}`, 'success');
   mixerLoop();
+  refreshTransport();
 }
 function mixerLoop() {
   if (!mixerPlay.active) return;
@@ -1730,6 +1843,7 @@ function stopMixer() {
   $('mixPlayBtn').textContent = '▶ PLAY MIX — from gold cursor';
   const ph = $('mixPlayhead');
   if (ph) ph.style.display = 'none';
+  refreshTransport();
 }
 function updateMixRepeatBtn() {
   const b = $('mixRepeatBtn');
@@ -1737,18 +1851,12 @@ function updateMixRepeatBtn() {
   b.textContent = state.mixer.repeat ? '↻ REPEAT ON' : '↻ REPEAT OFF';
 }
 
-/* ============ MIX EXPORT (hardware MP3/AAC print → Downloads + vault) ============ */
+/* ============ MIX EXPORT (.mp3) ============ */
 function pickMime() {
   if (!window.MediaRecorder) return null;
   const cands = ['audio/mpeg', 'audio/mp4;codecs=mp4a.40.2', 'audio/mp4', 'audio/webm;codecs=opus', 'audio/webm'];
   for (const m of cands) { try { if (MediaRecorder.isTypeSupported(m)) return m; } catch (e) {} }
   return null;
-}
-function extFor(mime) {
-  if (!mime) return 'wav';
-  if (mime.indexOf('mpeg') !== -1) return 'mp3';
-  if (mime.indexOf('mp4') !== -1) return 'mp3';
-  return 'webm';
 }
 async function exportMix() {
   const pairs = mixerPairs();
@@ -1788,12 +1896,12 @@ async function exportMix() {
       clearInterval(iv);
       btn.disabled = false;
       btn.textContent = '⭳ SAVE MIX';
-      await storeAndSaveMix(blob, extFor(mime), dur, mime);
+      await storeAndSaveMix(blob, dur, mime);
     } catch (err) {
       clearInterval(iv);
       btn.disabled = false;
       btn.textContent = '⭳ SAVE MIX';
-      toast('Hardware encoder failed — using studio WAV', 'error');
+      toast('Hardware encoder failed — using studio print', 'error');
       fallbackWavMix(pairs, dur);
     }
   } else {
@@ -1801,7 +1909,7 @@ async function exportMix() {
   }
 }
 async function fallbackWavMix(pairs, dur) {
-  toast('Rendering studio WAV...', 'success');
+  toast('Rendering studio print...', 'success');
   const sr = 44100;
   const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   if (!OC) { toast('Offline render not supported', 'error'); return; }
@@ -1826,19 +1934,19 @@ async function fallbackWavMix(pairs, dur) {
   try {
     const buf = await oc.startRendering();
     const blob = new Blob([audioBufferToWav(buf)], { type: 'audio/wav' });
-    await storeAndSaveMix(blob, 'wav', dur, 'audio/wav');
+    await storeAndSaveMix(blob, dur, null);
   } catch (err) { toast('Download failed: ' + err.message, 'error'); }
 }
-async function storeAndSaveMix(blob, ext, dur, mime) {
+async function storeAndSaveMix(blob, dur, mime) {
   const name = `RobotMix ${state.tracks.length + state.mixer.clips.length + 1}`;
-  const rec = { id: Date.now(), name, format: ext.toUpperCase(), mime, duration: dur, savedAt: new Date().toLocaleString(), blob };
+  const rec = { id: Date.now(), name, format: 'MP3', mime: mime || 'audio/wav', duration: dur, savedAt: new Date().toLocaleString(), blob };
   await dbPut('mixes', rec);
-  downloadBlob(blob, `${name.replace(/\s+/g, '-').toLowerCase()}.${ext}`);
+  downloadBlob(blob, `${name.replace(/\s+/g, '-').toLowerCase()}.mp3`);
   renderVault();
-  toast(`✓ MIX saved → phone Downloads (.${ext}) + vault panel`, 'success');
+  toast(`✓ ${name}.mp3 → Downloads + vault`, 'success');
 }
 
-/* ============ INDEXEDDB VAULT (safe offline project storage on device) ============ */
+/* ============ VAULT ============ */
 let _db = null;
 function idb() {
   return new Promise((res) => {
@@ -1898,7 +2006,25 @@ function dbClear(store) {
   }));
 }
 
-/* ============ PRODUCED MIXES & PROJECTS PANEL ============ */
+let vaultAudio = null;
+function stopVault() { if (vaultAudio) { vaultAudio.pause(); vaultAudio = null; } refreshTransport(); }
+function toggleVaultPlay() {
+  dbAll('mixes').then(list => {
+    if (!list.length) { toast('No mixes yet — print one first', 'error'); return; }
+    list.sort((a, b) => (b.id || 0) - (a.id || 0));
+    const mx = list[0];
+    if (vaultAudio && !vaultAudio.paused) { stopVault(); toast('⏹ Stopped'); return; }
+    stopAllPlayback();
+    vaultAudio = new Audio(URL.createObjectURL(mx.blob));
+    vaultAudio.loop = state.miscLoop;
+    try { vaultAudio.playbackRate = state.miscRate; } catch (e) {}
+    vaultAudio.onended = () => refreshTransport();
+    vaultAudio.play();
+    toast(`▶ ${mx.name}.mp3`, 'success');
+    refreshTransport();
+  });
+}
+
 function renderVault() {
   dbAll('mixes').then(list => {
     const el = $('mixVaultList');
@@ -1907,13 +2033,29 @@ function renderVault() {
     el.innerHTML = '';
     list.forEach(mx => {
       const item = document.createElement('div');
-      item.className = 'layer-item';
+      item.className = 'layer-item' + (state.selectedVaultIds.has(mx.id) ? ' selmarked-row' : '');
       item.innerHTML = `
         <button class="layer-btn play-layer" data-v="play" data-id="${mx.id}">▶</button>
-        <div class="layer-name">🎧 ${mx.name}</div>
-        <span class="layer-pos">${mx.format} · ${fmtTime(mx.duration || 0)}</span>
+        <div class="layer-name">🎧 ${mx.name}.mp3</div>
+        <span class="layer-pos">MP3 · ${fmtTime(mx.duration || 0)}</span>
         <button class="layer-btn" data-v="dl" data-id="${mx.id}">⭳</button>
         <button class="layer-btn delete" data-v="del" data-id="${mx.id}">🗑</button>`;
+      item.addEventListener('click', (e) => {
+        if (e.target.closest('[data-v]')) return;
+        if (state.deleteMode) {
+          showModal({ title: `Delete "${mx.name}.mp3" from vault?`, okText: 'DELETE', onOk: async () => {
+            await dbDel('mixes', mx.id);
+            state.selectedVaultIds.delete(mx.id);
+            renderVault();
+            toast('Mix removed', 'error');
+          }});
+        } else if (state.selectMode) {
+          if (state.selectedVaultIds.has(mx.id)) state.selectedVaultIds.delete(mx.id);
+          else state.selectedVaultIds.add(mx.id);
+          item.classList.toggle('selmarked-row');
+          updateDeleteSelectedLabel();
+        }
+      });
       el.appendChild(item);
     });
     el.querySelectorAll('[data-v]').forEach(b => {
@@ -1924,13 +2066,16 @@ function renderVault() {
         if (!mx) return;
         const a = b.dataset.v;
         if (a === 'play') {
-          const url = URL.createObjectURL(mx.blob);
-          const au = new Audio(url);
-          au.play();
-          toast(`▶ Playing ${mx.name} (${mx.format})`, 'success');
+          stopAllPlayback();
+          if (vaultAudio) vaultAudio.pause();
+          vaultAudio = new Audio(URL.createObjectURL(mx.blob));
+          vaultAudio.loop = state.miscLoop;
+          vaultAudio.play();
+          toast(`▶ Playing ${mx.name}.mp3`, 'success');
+          refreshTransport();
         } else if (a === 'dl') {
-          downloadBlob(mx.blob, `${mx.name.replace(/\s+/g, '-').toLowerCase()}.${(mx.format || 'wav').toLowerCase() === 'aac' ? 'm4a' : (mx.format || 'wav').toLowerCase()}`);
-          toast('✓ Saved again to Downloads', 'success');
+          downloadBlob(mx.blob, `${mx.name.replace(/\s+/g, '-').toLowerCase()}.mp3`);
+          toast('✓ .mp3 saved again to Downloads', 'success');
         } else if (a === 'del') {
           await dbDel('mixes', id);
           renderVault();
@@ -1962,7 +2107,8 @@ function applyProject(p) {
   state.mixer.nextLayerId = p.mixerNextLayerId || 1000; state.mixer.nextClipId = p.mixerNextClipId || 1000;
   state.mixer.activeLayerId = (state.mixer.layers[0] && state.mixer.layers[0].id) || null;
   state.mixer.insertPos = 0; state.mixer.selectedClipId = null;
-  state.selectedNoteIds.clear();
+  state.selectedNoteIds.clear(); state.selectedClipIds.clear();
+  state.selectedTrackIds.clear(); state.selectedVaultIds.clear();
   if (state.layers.length === 0) createLayer();
   if (state.mixer.layers.length === 0) createMixLayer();
   const al = getActiveLayer();
@@ -1970,6 +2116,7 @@ function applyProject(p) {
   renderLayers(); renderTimeline(); renderTracks(); renderMixerLayers(); renderMixerEditor(); renderMixerControls();
   updateInstrumentUI(); updateInfoLabels(); updateCursor();
   if (state.sizeMode === 'small') applySize('small'); else renderKeyboard();
+  refreshTransport();
   toast('✓ PROJECT LOADED — ready to play offline', 'success');
 }
 function renderProjects() {
@@ -2010,7 +2157,7 @@ function renderProjects() {
   });
 }
 
-/* ============ DOWNLOAD (layers) — studio WAV ============ */
+/* ============ DOWNLOAD (layers) ============ */
 async function downloadBeat() {
   const totalNotes = state.layers.reduce((s, l) => s + l.notes.length, 0);
   if (totalNotes === 0) { toast('No notes to download', 'error'); return; }
@@ -2170,58 +2317,124 @@ function setSpeed(idx) {
   state.playbackSpeed = SPEEDS[state.speedIdx];
   if (state.isPlaying && ctx) state.playbackStartTime = ctx.currentTime - pos * getBeatDur();
   else state.playbackPos = pos;
-  $('speedLabel').textContent = state.playbackSpeed + '×';
   toast(`SPEED ${state.playbackSpeed}×`);
+  refreshTransport();
+}
+function bumpSpeed(d) {
+  if (uiContext === 'beats') { setSpeed(state.speedIdx + d); return; }
+  if (uiContext === 'mixer') {
+    const c = getSelectedClip();
+    if (!c) { toast('Tap a clip first, then SPEED', 'error'); return; }
+    c.rate = Math.min(2, Math.max(0.5, Math.round((c.rate + d * 0.25) * 100) / 100));
+    renderMixerEditor(); renderMixerControls();
+    toast(`Clip speed ${c.rate}×`, 'success');
+  } else {
+    state.miscRate = Math.min(2, Math.max(0.5, Math.round((state.miscRate + d * 0.25) * 100) / 100));
+    if (trackPlay.active) trackPlay.rate = state.miscRate;
+    if (vaultAudio) { try { vaultAudio.playbackRate = state.miscRate; } catch (e) {} }
+    toast(`Speed ${state.miscRate}×`, 'success');
+  }
+  refreshTransport();
 }
 function updateModeOverlay() {
   const ov = $('modeOverlay');
-  if (state.selectMode) { ov.textContent = '✂ SELECT MODE — tap beats to mark'; ov.classList.add('active'); }
-  else if (state.deleteMode) { ov.textContent = '🗑 DELETE MODE — tap beat to remove'; ov.classList.add('active'); }
+  if (state.selectMode) { ov.textContent = '✂ SELECT MODE — tap to mark'; ov.classList.add('active'); }
+  else if (state.deleteMode) { ov.textContent = '🗑 DELETE MODE — tap to remove'; ov.classList.add('active'); }
   else ov.classList.remove('active');
 }
 
 /* ============ EVENTS ============ */
 function bindEvents() {
   $('playBtn').onclick = () => {
-    if (state.isPlaying) { stopPlayback(); return; }
-    const sel = getSelectedLayers();
-    startPlayback(state.playbackPos || 0, sel.length ? sel.map(l => l.id) : null);
+    if (uiContext === 'mixer') { mixerPlay.active ? stopMixer() : playMixer(); return; }
+    if (uiContext === 'session') {
+      const tr = state.tracks[state.tracks.length - 1];
+      if (!tr) { toast('No session yet — record one', 'error'); return; }
+      if (trackPlay.active && trackPlay.track.id === tr.id) { stopTrack(); renderTracks(); }
+      else playTrack(tr);
+      return;
+    }
+    if (uiContext === 'vault') { toggleVaultPlay(); return; }
+    if (state.isPlaying) stopPlayback();
+    else {
+      const sel = getSelectedLayers();
+      startPlayback(state.playbackPos || 0, sel.length ? sel.map(l => l.id) : null);
+    }
   };
-  $('stopBtn').onclick = () => { stopAllPlayback(); toast('⏹ Stopped'); };
+  $('stopBtn').onclick = () => { stopAllPlayback(); renderTracks(); toast('⏹ Stopped'); };
   $('playSelectedBtn').onclick = () => {
+    if (uiContext === 'mixer') { mixerPlay.active ? stopMixer() : playMixer(); return; }
+    if (uiContext === 'session') {
+      const ids = [...state.selectedTrackIds];
+      const pool = ids.length ? state.tracks.filter(t => ids.includes(t.id)) : state.tracks.slice(-1);
+      if (!pool.length) { toast('No sessions', 'error'); return; }
+      stopAllPlayback();
+      playTrack(pool[0]);
+      return;
+    }
+    if (uiContext === 'vault') { toggleVaultPlay(); return; }
     const sel = getSelectedLayers();
-    if (sel.length === 0) { toast('No layers selected', 'error'); return; }
+    if (!sel.length) { toast('No layers selected', 'error'); return; }
     stopAllPlayback(); startPlayback(0, sel.map(l => l.id));
-    toast(`▶ Playing ${sel.length} selected layer(s)`, 'success');
   };
   $('playAllBtn').onclick = () => { stopAllPlayback(); startPlayback(0, null); toast('▶ Playing all layers', 'success'); };
   $('loopBtn').onclick = () => {
-    state.isLooping = !state.isLooping;
-    $('loopBtn').classList.toggle('on', state.isLooping);
-    toast(state.isLooping ? '↻ LOOP ON' : '↻ LOOP OFF');
+    if (uiContext === 'beats') { state.isLooping = !state.isLooping; toast(state.isLooping ? '↻ LOOP ON' : '↻ LOOP OFF'); }
+    else if (uiContext === 'mixer') { state.mixer.repeat = !state.mixer.repeat; updateMixRepeatBtn(); toast(state.mixer.repeat ? '↻ REPEAT ON — endless mix' : '↻ REPEAT OFF', state.mixer.repeat ? 'success' : ''); }
+    else { state.miscLoop = !state.miscLoop; if (vaultAudio) vaultAudio.loop = state.miscLoop; toast(state.miscLoop ? '↻ LOOP ON' : '↻ LOOP OFF'); }
+    refreshTransport();
   };
   $('deleteModeBtn').onclick = () => {
     state.deleteMode = !state.deleteMode;
-    if (state.deleteMode) { state.selectMode = false; $('selectBeatsBtn').classList.remove('on'); }
+    if (state.deleteMode) { state.selectMode = false; }
     $('deleteModeBtn').classList.toggle('active', state.deleteMode);
     updateModeOverlay();
-    toast(state.deleteMode ? '🗑 DELETE MODE — tap a beat to remove' : '🗑 DELETE MODE OFF', state.deleteMode ? 'error' : 'success');
+    toast(state.deleteMode ? `🗑 DELETE MODE — tap items in ${uiContext.toUpperCase()}` : '🗑 DELETE MODE OFF', state.deleteMode ? 'error' : 'success');
   };
   $('selectBeatsBtn').onclick = () => {
     state.selectMode = !state.selectMode;
     if (state.selectMode) { state.deleteMode = false; $('deleteModeBtn').classList.remove('active'); }
-    $('selectBeatsBtn').classList.toggle('on', state.selectMode);
-    if (!state.selectMode) { state.selectedNoteIds.clear(); renderTimeline(); }
-    updateDeleteSelectedLabel(); updateModeOverlay();
-    toast(state.selectMode ? '✂ SELECT MODE — tap beats to mark' : '✂ SELECT MODE OFF', state.selectMode ? 'success' : '');
+    if (!state.selectMode) {
+      state.selectedNoteIds.clear(); state.selectedClipIds.clear();
+      state.selectedTrackIds.clear(); state.selectedVaultIds.clear();
+      renderTimeline(); renderMixerEditor(); renderTracks(); renderVault();
+    }
+    updateModeOverlay(); updateDeleteSelectedLabel();
+    toast(state.selectMode ? `✂ SELECT MODE — mark items in ${uiContext.toUpperCase()}` : '✂ SELECT MODE OFF', state.selectMode ? 'success' : '');
   };
   $('deleteSelectedBtn').onclick = () => {
-    if (state.selectedNoteIds.size === 0) { toast('No beats selected', 'error'); return; }
-    const count = state.selectedNoteIds.size;
-    state.layers.forEach(l => { l.notes = l.notes.filter(n => !state.selectedNoteIds.has(n.id)); });
-    state.selectedNoteIds.clear();
-    renderLayers(); renderTimeline(); updateDeleteSelectedLabel();
-    toast(`🗑 Removed ${count} selected beat${count > 1 ? 's' : ''}`, 'error');
+    if (uiContext === 'mixer') {
+      if (!state.selectedClipIds.size) { toast('No clips selected', 'error'); return; }
+      const n = state.selectedClipIds.size;
+      state.mixer.clips = state.mixer.clips.filter(c => !state.selectedClipIds.has(c.id));
+      state.selectedClipIds.clear();
+      renderMixerEditor(); renderMixerControls();
+      toast(`Removed ${n} clip(s)`, 'error');
+    } else if (uiContext === 'session') {
+      if (!state.selectedTrackIds.size) { toast('No tracks selected', 'error'); return; }
+      const n = state.selectedTrackIds.size;
+      state.tracks = state.tracks.filter(t => !state.selectedTrackIds.has(t.id));
+      state.mixer.clips = state.mixer.clips.filter(c => !state.selectedTrackIds.has(c.trackId));
+      state.selectedTrackIds.clear();
+      renderTracks(); renderMixerEditor();
+      toast(`Removed ${n} track(s)`, 'error');
+    } else if (uiContext === 'vault') {
+      if (!state.selectedVaultIds.size) { toast('No mixes selected', 'error'); return; }
+      const n = state.selectedVaultIds.size;
+      Promise.all([...state.selectedVaultIds].map(id => dbDel('mixes', id))).then(() => {
+        state.selectedVaultIds.clear();
+        renderVault();
+        toast(`Removed ${n} mix(es)`, 'error');
+      });
+    } else {
+      if (!state.selectedNoteIds.size) { toast('No beats selected', 'error'); return; }
+      const n = state.selectedNoteIds.size;
+      state.layers.forEach(l => { l.notes = l.notes.filter(x => !state.selectedNoteIds.has(x.id)); });
+      state.selectedNoteIds.clear();
+      renderLayers(); renderTimeline();
+      toast(`Removed ${n} beat(s)`, 'error');
+    }
+    updateDeleteSelectedLabel();
   };
   $('downloadBtn').onclick = downloadBeat;
   $('downloadBtn2').onclick = downloadBeat;
@@ -2229,8 +2442,8 @@ function bindEvents() {
     const b = parseInt(e.target.value);
     if (b >= 40 && b <= 240) { state.bpm = b; toast(`BPM: ${b}`, 'success'); }
   };
-  $('speedDownBtn').onclick = () => setSpeed(state.speedIdx - 1);
-  $('speedUpBtn').onclick = () => setSpeed(state.speedIdx + 1);
+  $('speedDownBtn').onclick = () => bumpSpeed(-1);
+  $('speedUpBtn').onclick = () => bumpSpeed(1);
   $('addLayerBtn').onclick = () => { createLayer(); toast('Layer added & selected as REC target', 'success'); };
   $('selectAllBtn').onclick = () => { state.layers.forEach(l => l.selected = true); renderLayers(); toast('All layers selected', 'success'); };
   $('selectNoneBtn').onclick = () => { state.layers.forEach(l => l.selected = false); renderLayers(); toast('All deselected'); };
@@ -2315,10 +2528,15 @@ function bindEvents() {
   document.addEventListener('contextmenu', (e) => {
     if (e.target.closest('.keyboard') || e.target.closest('.note-block') || e.target.closest('.mix-clip')) e.preventDefault();
   });
+  window.addEventListener('scroll', () => { requestAnimationFrame(detectContext); }, { passive: true });
+  document.addEventListener('pointerdown', (e) => {
+    const s = e.target.closest('section[data-ctx]');
+    if (s) setContext(s.dataset.ctx);
+  }, true);
   window.addEventListener('resize', () => { if (state.sizeMode === 'small') applySize('small'); });
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT') return;
-    if (e.code === 'Space') { e.preventDefault(); state.isPlaying ? stopPlayback() : startPlayback(state.playbackPos || 0, null); }
+    if (e.code === 'Space') { e.preventDefault(); $('playBtn').click(); }
   });
 }
 
@@ -2348,12 +2566,14 @@ function init() {
   createMixLayer('Mix C');
   renderLayers(); renderKeyboard(); renderTimeline(); renderTracks();
   renderMixerLayers(); renderMixerEditor(); renderMixerControls();
-  updateInstrumentUI(); updateInfoLabels(); updateDeleteSelectedLabel(); updateMixRepeatBtn();
+  updateInstrumentUI(); updateInfoLabels(); updateMixRepeatBtn();
   $('mixZoomLabel').textContent = mixPx() + 'px/s';
   setupSyncScroll(); bindEvents();
   applySize('small');
   renderVault(); renderProjects();
-  toast('◆ GREEN STUDIO READY — print mixes to phone + offline project vault', 'success');
+  updateCtxChip(); refreshTransport();
+  detectContext();
+  toast('◆ LAYOUT-AWARE STUDIO — top bar follows your workspace', 'success');
 }
 init();
 </script>
