@@ -133,6 +133,16 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .rec-hint { margin-top: 8px; font-family: var(--mono); font-size: 0.62rem; color: var(--dim2); letter-spacing: 0.05em; line-height: 1.6; padding: 6px 8px; background: var(--panel2); border-radius: 6px; border: 1px dashed var(--line); }
 .rec-hint b { color: var(--mg); }
 
+/* ===== UPLOAD BOX (no arrow emoji) ===== */
+.upload-box {
+  margin-top: 10px; padding: 14px 10px; text-align: center;
+  font-family: var(--mono); font-size: 0.72rem; font-weight: 700; letter-spacing: 0.05em;
+  color: var(--vi); background: var(--panel2);
+  border: 2px dashed var(--vi); border-radius: 10px; cursor: pointer;
+  transition: all 0.15s;
+}
+.upload-box:active { transform: scale(0.98); background: rgba(110,231,160,0.08); }
+
 /* ===== KEYBOARD ===== */
 .kb-controls { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 6px; margin-bottom: 8px; }
 .kb-controls .full { grid-column: 1 / -1; }
@@ -202,6 +212,8 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .rec-session-btn { width: 100%; padding: 15px; border-radius: 10px; font-family: var(--mono); font-size: 0.85rem; font-weight: 800; letter-spacing: 0.06em; background: var(--panel2); border: 2px solid var(--mg); color: var(--mg); transition: all 0.15s; }
 .rec-session-btn:active { transform: scale(0.97); }
 .rec-session-btn.recording { background: linear-gradient(135deg, var(--mg), #0e9f4e); color: #fff; animation: pulse 1.2s infinite; }
+.rec-session-btn.voice { border-color: var(--vi); color: var(--vi); }
+.rec-session-btn.voice.recording { background: linear-gradient(135deg, var(--vi), #4dc7f0); color: #04121a; animation: pulse 1.2s infinite; }
 .rec-elapsed { font-family: var(--mono); font-size: 0.8rem; font-weight: 800; color: var(--mg); }
 
 /* ===== MIXER ===== */
@@ -222,6 +234,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 .mix-active .mix-content { background-color: rgba(34, 197, 94, 0.04); }
 .mix-mark { position: absolute; top: 0; bottom: 0; border-left: 1px solid rgba(143, 199, 161, 0.15); font-family: var(--mono); font-size: 0.55rem; color: var(--dim2); padding-left: 3px; }
 .mix-clip { position: absolute; top: 5px; height: 42px; border-radius: 5px; border: 1px solid rgba(0, 0, 0, 0.4); box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.25); display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: var(--mono); color: #0c1a02; overflow: hidden; cursor: grab; touch-action: none; z-index: 2; padding: 0 10px; }
+.mix-clip.voiceclip { border-style: dashed; }
 .mix-clip span { font-size: 0.6rem; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 .mix-clip em { font-style: normal; font-size: 0.52rem; font-weight: 700; opacity: 0.75; }
 .mix-clip.selclip { box-shadow: 0 0 0 3px var(--cy), 0 0 14px rgba(74, 222, 128, 0.6); }
@@ -349,7 +362,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 <header class="transport-wrapper">
   <div class="fixed-cluster">
     <button class="note-fixed" id="noteToggleBtn" title="Notes overlay">📝</button>
-    <button class="note-fixed dl" id="dlCenterBtn" title="Download center">⭳</button>
+    <button class="note-fixed dl" id="dlCenterBtn" title="Download center">🗂️</button>
   </div>
   <div class="transport-scroll">
     <div class="transport-bar">
@@ -401,8 +414,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
     <div class="rec-hint">
       <b>✓</b> select layer → beats record INTO it + it plays · tap row = REC target ·
-      <b>📝</b> (fixed top-left) opens the auto-note overlay — C3D3 = together, C3+D3 = after, C3+D3Fast = fast after, space = long gap ·
-      <b>⭳</b> (fixed top-left) opens the Download Center · one press = one sound + one note.
+      <b>📝</b> (fixed top-left) opens the auto-note overlay · <b>🗂️</b> opens the Download Center · one press = one sound + one note.
     </div>
   </section>
 
@@ -464,6 +476,22 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     <div class="layer-list" id="trackList" style="margin-top: 10px;"></div>
   </section>
 
+  <section class="section" data-ctx="session">
+    <div class="section-header">
+      <h2>◆ VOICE RECORD & UPLOADS</h2>
+      <span class="rec-elapsed" id="voiceElapsed">0:00.0</span>
+    </div>
+    <button class="rec-session-btn voice" id="voiceRecBtn">🎤 CLICK TO RECORD VOICE — beats keep playing</button>
+    <div class="upload-box" id="uploadBox">📁 UPLOAD AUDIO (.mp3 / .m4a) — tap to choose a file</div>
+    <input type="file" id="audioFile" accept=".mp3,.m4a,audio/mpeg,audio/mp4,audio/x-m4a,audio/*" style="display:none">
+    <div class="layer-list" id="voiceList" style="margin-top: 10px;"></div>
+    <div class="rec-hint">
+      Record your voice <b>over the playing beats</b> (recording never stops the beat) or <b>📁 upload .mp3/.m4a</b>.
+      Takes & uploads appear below and drop into the <b>MIXER</b> with ＋ as editable clips (drag / resize / speed / volume).
+      Mic blocked? The app auto-prompts permission; if denied, tap RETRY after allowing it in browser settings.
+    </div>
+  </section>
+
   <section class="section" data-ctx="mixer">
     <div class="section-header">
       <h2>◆ MIXER — DRAG · RESIZE · REMIX</h2>
@@ -485,7 +513,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
     </div>
     <button class="mix-play-btn" id="mixPlayBtn">▶ PLAY MIX — from gold cursor</button>
     <div class="rec-hint">
-      <b>DRAG</b> clip = move · <b>EDGES</b> = resize · <b>TAP</b> = controls · <b>▶ PLAY MIX</b> now streams clips live (no freeze, endless repeat, instant stop) · downloads only when you ask, shown in Download Center.
+      <b>DRAG</b> clip = move · <b>EDGES</b> = resize · <b>TAP</b> = controls · voice & uploaded clips (dashed) mix with beats · <b>▶ PLAY MIX</b> streams everything live.
     </div>
   </section>
 
@@ -538,7 +566,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 <!-- ===== DOWNLOAD CENTER ===== -->
 <div class="dl-center" id="dlCenter">
   <div class="dl-head">
-    <span>⭳ DOWNLOAD CENTER</span>
+    <span>🗂️ DOWNLOAD CENTER</span>
     <span class="dl-hbtns">
       <button id="dlClear">CLEAR</button>
       <button id="dlToggle">—</button>
@@ -592,7 +620,7 @@ const state = {
   selectedVaultIds: new Set(),
   miscLoop: false, miscRate: 1,
   session: { recording: false, start: 0, events: [], timer: null },
-  tracks: [], nextTrackId: 1,
+  tracks: [], voiceTracks: [], nextTrackId: 1,
   mixer: {
     layers: [], nextLayerId: 1,
     clips: [], nextClipId: 1,
@@ -1208,6 +1236,9 @@ function createLayer(name, instrument) {
 function getActiveLayer() { return state.layers.find(l => l.id === state.activeLayerId); }
 function getSelectedLayers() { return state.layers.filter(l => l.selected && !l.muted); }
 function trackById(id) { return state.tracks.find(t => t.id === id); }
+function voiceById(id) { return state.voiceTracks.find(t => t.id === id); }
+function findTrack(id) { return trackById(id) || voiceById(id); }
+function isAudioTrack(tr) { return !!tr && (tr.kind === 'voice' || tr.kind === 'upload'); }
 function renameLayer(id) {
   const layer = state.layers.find(l => l.id === id);
   if (!layer) return;
@@ -1598,39 +1629,62 @@ function drawPlayhead(pos) {
   });
 }
 
-/* ============ MIXER PLAYBACK — FIXED: live lookahead scheduler (no freeze, endless repeat, instant stop) ============ */
+/* ============ MIXER PLAYBACK — live lookahead scheduler with VOICE/UPLOAD support ============ */
 let mixerPlay = { active: false, bus: null, pairs: [], total: 1, origin: 0, T0: 0, timer: null };
 function mixPx() { return MIX_PX_LEVELS[state.mixer.pxIdx]; }
 function getActiveMixLayer() { return state.mixer.layers.find(l => l.id === state.mixer.activeLayerId); }
 function mixOnLayers() { return state.mixer.layers.filter(l => l.selected && !l.muted); }
 function getSelectedClip() { return state.mixer.clips.find(c => c.id === state.mixer.selectedClipId); }
-function clipSrc(c, tr) { const so = c.srcOffset || 0; const ln = (c.len != null ? c.len : (tr ? tr.duration - so : 0)); return { so, ln }; }
+function clipSrc(c, tr) { const so = c.srcOffset || 0; const ln = (c.len != null ? c.len : (tr ? tr.duration : 0)); return { so, ln }; }
 function mixerPairs() {
   const onLayers = mixOnLayers();
   return state.mixer.clips.filter(c => onLayers.some(l => l.id === c.layerId))
-    .map(c => ({ c, tr: trackById(c.trackId) })).filter(x => x.tr);
+    .map(c => ({ c, tr: findTrack(c.trackId) })).filter(x => x.tr);
 }
 function mixerDuration(pairs) {
   let dur = 0;
   pairs.forEach(({ c, tr }) => { const { ln } = clipSrc(c, tr); dur = Math.max(dur, c.start + ln / c.rate); });
   return dur;
 }
-/* Build sorted, trimmed event lists per clip for the scheduler */
+function voiceBufCache(tr) { if (!tr._bufs) tr._bufs = new WeakMap(); return tr._bufs; }
+async function ensureVoiceBuffer(tr, c) {
+  const cache = voiceBufCache(tr);
+  if (cache.has(c)) return cache.get(c);
+  const ab = await tr.blob.arrayBuffer();
+  const buf = await c.decodeAudioData(ab);
+  cache.set(c, buf);
+  return buf;
+}
+function scheduleVoiceSrc(c2, p, when) {
+  const buf = voiceBufCache(p.tr).get(c2);
+  if (!buf) return;
+  const src = c2.createBufferSource();
+  src.buffer = buf;
+  src.playbackRate.value = p.c.rate;
+  const so = Math.min(p.c.srcOffset || 0, Math.max(0, buf.duration - 0.05));
+  const durSrc = Math.max(0.05, Math.min(p.c.len, buf.duration - so));
+  src.connect(p.gain);
+  src.start(Math.max(0.001, when), so, durSrc);
+}
 function buildPairs() {
   return mixerPairs().map(({ c, tr }) => {
+    if (isAudioTrack(tr)) return { c, tr, voice: true, loop: 0, gain: null };
     const { so, ln } = clipSrc(c, tr);
-    const evs = tr.events
+    const evs = (tr.events || [])
       .filter(ev => ev.t >= so && ev.t < so + ln)
       .map(ev => ({ mixT: c.start + (ev.t - so) / c.rate, ev }))
       .sort((a, b) => a.mixT - b.mixT);
     return { c, tr, evs, ptr: 0, loop: 0, gain: null };
-  }).filter(p => p.evs.length);
+  }).filter(p => p.voice ? true : p.evs.length);
 }
-function playMixer() {
+async function playMixer() {
   const pairs = buildPairs();
-  if (!pairs.length) { toast('No beats in mixer yet — add clips with ＋ on a session', 'error'); return; }
+  if (!pairs.length) { toast('No beats in mixer yet — add clips with ＋', 'error'); return; }
   initAudio(); resumeCtx();
   stopAllPlayback();
+  try {
+    for (const p of pairs) if (p.voice) await ensureVoiceBuffer(p.tr, ctx);
+  } catch (e) { toast('Audio decode failed: ' + e.message, 'error'); }
   const bus = makeBus();
   pairs.forEach(p => { p.gain = ctx.createGain(); p.gain.value = p.c.volume; p.gain.connect(bus); });
   const total = Math.max(0.5, mixerDuration(pairs));
@@ -1647,10 +1701,22 @@ function playMixer() {
 function mixerSchedule() {
   if (!mixerPlay.active || !ctx) return;
   const now = ctx.currentTime;
-  const ahead = document.hidden ? 3.0 : 0.4;   // bigger lookahead when app is minimized
+  const ahead = document.hidden ? 3.0 : 0.4;
   const elNow = mixerPlay.origin + (now - mixerPlay.T0);
   const horizon = elNow + ahead;
   mixerPlay.pairs.forEach(p => {
+    if (p.voice) {
+      while (true) {
+        const T = p.loop * mixerPlay.total + p.c.start;
+        if (T < elNow - 0.05) { p.loop++; if (p.loop > 100000) break; continue; }
+        if (T <= horizon) {
+          const when = mixerPlay.T0 + (T - mixerPlay.origin);
+          scheduleVoiceSrc(ctx, p, when);
+          p.loop++;
+        } else break;
+      }
+      return;
+    }
     while (true) {
       if (p.ptr >= p.evs.length) {
         if (!state.mixer.repeat) break;
@@ -1659,7 +1725,7 @@ function mixerSchedule() {
       }
       const { mixT, ev } = p.evs[p.ptr];
       const T = p.loop * mixerPlay.total + mixT;
-      if (T < elNow - 0.05) { p.ptr++; continue; }   // skip anything missed
+      if (T < elNow - 0.05) { p.ptr++; continue; }
       if (T <= horizon) {
         const when = mixerPlay.T0 + (T - mixerPlay.origin);
         const off = Math.max(0, when - now);
@@ -1673,7 +1739,7 @@ function stopMixer() {
   if (mixerPlay.timer) clearInterval(mixerPlay.timer);
   mixerPlay.timer = null;
   mixerPlay.active = false;
-  killBus(mixerPlay.bus); mixerPlay.bus = null;   // instant silence
+  killBus(mixerPlay.bus); mixerPlay.bus = null;
   $('mixPlayBtn').classList.remove('playing');
   $('mixPlayBtn').textContent = '▶ PLAY MIX — from gold cursor';
   const ph = $('mixPlayhead');
@@ -1685,7 +1751,7 @@ function drawMixPlayhead(t) {
   if (ph) { ph.style.display = 'block'; ph.style.left = (MIX_LABEL_W + t * mixPx()) + 'px'; }
 }
 
-/* ============ SESSION ============ */
+/* ============ SESSION RECORDER ============ */
 function fmtTime(s) { s = Math.max(0, s); return Math.floor(s / 60) + ':' + String(Math.floor(s % 60)).padStart(2, '0'); }
 function fmtElapsed(s) { return fmtTime(s) + '.' + Math.floor((s % 1) * 10); }
 function startSession() {
@@ -1710,12 +1776,12 @@ function stopSession() {
   if (evs.length === 0) { $('recElapsed').textContent = '0:00.0'; toast('Nothing recorded — play some keys!', 'error'); return; }
   const last = evs[evs.length - 1];
   const duration = last.t + last.dur + 0.5;
-  const track = { id: state.nextTrackId++, name: `Session ${state.tracks.length + 1}`, events: evs, duration };
+  const track = { id: state.nextTrackId++, name: `Session ${state.tracks.length + 1}`, kind: 'beat', events: evs, duration };
   state.tracks.push(track);
   state.session.events = [];
   $('recElapsed').textContent = '0:00.0';
   renderTracks();
-  toast(`✓ Saved "${track.name}" (${fmtTime(duration)}) — drop it into the MIXER with ＋`, 'success');
+  toast(`✓ Saved "${track.name}" (${fmtTime(duration)}) — drop into MIXER with ＋`, 'success');
 }
 let trackPlay = { active: false, bus: null, track: null, T0: 0, rate: 1 };
 function playTrack(tr) {
@@ -1810,6 +1876,155 @@ function renderTracks() {
   });
 }
 
+/* ============ VOICE RECORDER (fixed mic permission flow) ============ */
+let voiceRec = { active: false, rec: null, chunks: [], t0: 0, timer: null, stream: null };
+function showMicBlocked() {
+  showModal({
+    title: '🎤 Microphone is OFF or blocked. Turn ON microphone permission for this site/browser, then tap RETRY to record your voice.',
+    okText: 'RETRY',
+    onOk: () => { toggleVoiceRec(); }
+  });
+}
+async function requestMic() {
+  /* legacy fallback for old webviews */
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+    if (navigator.getUserMedia) {
+      return new Promise((res, rej) => navigator.getUserMedia({ audio: true }, res, rej));
+    }
+    throw new Error('NO_MEDIA_API');
+  }
+  /* auto-prompt permission; if previously denied, guide the user */
+  try {
+    if (navigator.permissions && navigator.permissions.query) {
+      const st = await navigator.permissions.query({ name: 'microphone' }).catch(() => null);
+      if (st && st.state === 'denied') { showMicBlocked(); throw new Error('DENIED'); }
+    }
+  } catch (e) { if (e.message === 'DENIED') throw e; }
+  return navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: true, noiseSuppression: true } });
+}
+async function toggleVoiceRec() {
+  if (voiceRec.active) { stopVoiceRec(); return; }
+  if (!window.MediaRecorder) { toast('Voice recorder not supported on this browser', 'error'); return; }
+  let stream = null;
+  try { stream = await requestMic(); }
+  catch (err) {
+    if (err && err.name === 'NotAllowedError') showMicBlocked();
+    else if (err && err.name === 'NotFoundError') toast('No microphone found on this device', 'error');
+    else if (err && err.message === 'DENIED') { /* modal already shown */ }
+    else if (err && err.message === 'NO_MEDIA_API') toast('Microphone API not available here', 'error');
+    else toast('Mic error: ' + (err.message || err), 'error');
+    return;
+  }
+  try {
+    initAudio(); resumeCtx();   /* beats keep playing — we do NOT stop playback */
+    const rec = new MediaRecorder(stream);
+    voiceRec = { active: true, rec, chunks: [], t0: performance.now(), timer: null, stream };
+    rec.ondataavailable = (e) => { if (e.data && e.data.size) voiceRec.chunks.push(e.data); };
+    rec.onstop = () => {
+      const blob = new Blob(voiceRec.chunks, { type: rec.mimeType || 'audio/webm' });
+      const dur = Math.max(0.5, (performance.now() - voiceRec.t0) / 1000);
+      const track = { id: state.nextTrackId++, name: `Voice ${state.voiceTracks.length + 1}`, kind: 'voice', blob, mime: rec.mimeType || 'audio/webm', duration: dur };
+      state.voiceTracks.push(track);
+      renderVoiceList();
+      stream.getTracks().forEach(t => t.stop());
+      toast(`✓ Voice saved (${fmtTime(dur)}) — add to MIXER with ＋`, 'success');
+    };
+    rec.start();
+    voiceRec.timer = setInterval(() => { $('voiceElapsed').textContent = fmtElapsed((performance.now() - voiceRec.t0) / 1000); }, 100);
+    $('voiceRecBtn').classList.add('recording');
+    $('voiceRecBtn').textContent = '■ CLICK TO STOP & SAVE VOICE';
+    toast('🎤 Recording voice — beats keep playing', 'success');
+  } catch (err) {
+    stream.getTracks().forEach(t => t.stop());
+    toast('Recorder start failed: ' + err.message, 'error');
+  }
+}
+function stopVoiceRec() {
+  if (!voiceRec.active) return;
+  voiceRec.active = false;
+  clearInterval(voiceRec.timer);
+  $('voiceElapsed').textContent = '0:00.0';
+  $('voiceRecBtn').classList.remove('recording');
+  $('voiceRecBtn').textContent = '🎤 CLICK TO RECORD VOICE — beats keep playing';
+  try { voiceRec.rec.stop(); } catch (e) {}
+}
+
+/* ============ UPLOAD BOX (.mp3 / .m4a) ============ */
+async function handleAudioUpload(file) {
+  if (!file) return;
+  const okType = /audio\/|\.mp3|\.m4a/i.test((file.type || '') + file.name);
+  if (!okType) { toast('Only .mp3 / .m4a audio files', 'error'); return; }
+  initAudio(); resumeCtx();
+  try {
+    const ab = await file.arrayBuffer();
+    const buf = await ctx.decodeAudioData(ab);
+    const track = {
+      id: state.nextTrackId++,
+      name: (file.name.replace(/\.[^.]+$/, '') || ('Upload ' + (state.voiceTracks.length + 1))).slice(0, 20),
+      kind: 'upload', blob: file, mime: file.type || 'audio/mpeg', duration: buf.duration
+    };
+    voiceBufCache(track).set(ctx, buf);
+    state.voiceTracks.push(track);
+    renderVoiceList();
+    toast(`✓ "${track.name}" uploaded — add to MIXER with ＋`, 'success');
+  } catch (err) {
+    toast('Cannot read that audio file', 'error');
+  }
+}
+function renderVoiceList() {
+  const list = $('voiceList');
+  list.innerHTML = '';
+  if (state.voiceTracks.length === 0) { list.innerHTML = '<div class="empty-state">// NO VOICE / UPLOADS YET — 🎤 record or 📁 upload</div>'; return; }
+  state.voiceTracks.forEach(tr => {
+    const item = document.createElement('div');
+    item.className = 'layer-item';
+    item.dataset.trackRow = 'v' + tr.id;
+    item.innerHTML = `
+      <button class="layer-btn play-layer" data-v="play" data-id="${tr.id}">▶</button>
+      <div class="layer-name" data-v="rename" data-id="${tr.id}">${tr.kind === 'voice' ? '🎤' : '📁'} ${tr.name}</div>
+      <span class="layer-pos">${fmtTime(tr.duration)}</span>
+      <button class="layer-btn mixadd" data-v="mix" data-id="${tr.id}" title="Drop into mixer at cursor">＋</button>
+      <button class="layer-btn" data-v="dl" data-id="${tr.id}">⭳</button>
+      <button class="layer-btn delete" data-v="del" data-id="${tr.id}">🗑</button>`;
+    list.appendChild(item);
+  });
+  list.querySelectorAll('[data-v]').forEach(el => {
+    el.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const id = parseInt(el.dataset.id);
+      const tr = voiceById(id);
+      if (!tr) return;
+      const a = el.dataset.v;
+      if (a === 'play') {
+        stopAllPlayback();
+        const au = new Audio(URL.createObjectURL(tr.blob));
+        au.play();
+        toast(`▶ ${tr.name}`, 'success');
+      }
+      else if (a === 'rename') {
+        showModal({ title: 'Rename take', textMode: true, initial: tr.name, okText: 'SAVE', onOk: (v) => {
+          if (v && v.trim()) { tr.name = v.trim().slice(0, 20); renderVoiceList(); renderMixerEditor(); toast(`Renamed → "${tr.name}"`, 'success'); }
+        }});
+      }
+      else if (a === 'mix') addClip(id);
+      else if (a === 'dl') {
+        askYes(`Download "${tr.name}" as .mp3?`, () => {
+          downloadBlob(tr.blob, `${tr.name.replace(/\s+/g, '-').toLowerCase()}.mp3`);
+          toast(`✓ ${tr.name} → Downloads`, 'success');
+        });
+      }
+      else if (a === 'del') {
+        showModal({ title: `Delete "${tr.name}"?`, okText: 'DELETE', onOk: () => {
+          state.voiceTracks = state.voiceTracks.filter(t => t.id !== id);
+          state.mixer.clips = state.mixer.clips.filter(c => c.trackId !== id);
+          renderVoiceList(); renderMixerEditor();
+          toast('Deleted', 'error');
+        }});
+      }
+    });
+  });
+}
+
 /* ============ UI LOOP ============ */
 let uiRAF = null;
 function startUiLoop() {
@@ -1857,22 +2072,28 @@ function createMixLayer(name) {
   renderMixerLayers(); renderMixerEditor();
   return layer;
 }
-function addClip(trackId) {
-  const tr = trackById(trackId);
-  if (!tr) { toast('Record a session first', 'error'); return; }
+async function addClip(trackId) {
+  const tr = findTrack(trackId);
+  if (!tr) { toast('Record a session / voice or upload audio first', 'error'); return; }
   if (!getActiveMixLayer()) state.mixer.activeLayerId = state.mixer.layers[0]?.id || null;
+  let len = tr.duration;
+  if (isAudioTrack(tr)) {
+    try { initAudio(); resumeCtx(); const buf = await ensureVoiceBuffer(tr, ctx); len = buf.duration; }
+    catch (e) { toast('Audio decode failed', 'error'); return; }
+  }
   const clip = {
     id: state.mixer.nextClipId++,
     trackId,
     layerId: state.mixer.activeLayerId,
     start: state.mixer.insertPos,
     rate: 1, volume: 1,
-    srcOffset: 0, len: tr.duration
+    srcOffset: 0, len,
+    voice: isAudioTrack(tr)
   };
   state.mixer.clips.push(clip);
   state.mixer.selectedClipId = clip.id;
   renderMixerLayers(); renderMixerEditor(); renderMixerControls();
-  toast(`+ "${tr.name}" clip @ ${clip.start.toFixed(1)}s — drag body / edges`, 'success');
+  toast(`+ "${tr.name}" clip @ ${clip.start.toFixed(1)}s — drag / resize / edit`, 'success');
 }
 function selectClip(id) {
   state.mixer.selectedClipId = id;
@@ -1934,10 +2155,10 @@ function renderMixerControls() {
     box.innerHTML = '<span class="mc-label" style="color:var(--dim2)">TAP A CLIP → SPEED / VOLUME / nudge / dup / delete appear here · DRAG edges to resize</span>';
     return;
   }
-  const tr = trackById(clip.trackId);
+  const tr = findTrack(clip.trackId);
   const { ln } = clipSrc(clip, tr);
   box.innerHTML = `
-    <span class="mc-label">🎵 ${tr ? tr.name : '—'}</span>
+    <span class="mc-label">${tr ? (isAudioTrack(tr) ? (tr.kind === 'voice' ? '🎤 ' : '📁 ') : '🎵 ') + tr.name : '—'}</span>
     <div class="mc-group"><span class="lbl">SPEED</span>
       <button class="spd-btn" data-c="rdown" data-id="${clip.id}">−</button>
       <span class="mc-val">${clip.rate}×</span>
@@ -1948,7 +2169,7 @@ function renderMixerControls() {
       <span class="mc-val">${Math.round(clip.volume * 100)}%</span>
       <button class="spd-btn" data-c="vup" data-id="${clip.id}">+</button>
     </div>
-    <div class="mc-group"><span class="lbl">POS ${clip.start.toFixed(1)}s · LEN ${ln.toFixed(1)}s</span>
+    <div class="mc-group"><span class="lbl">POS ${clip.start.toFixed(1)}s · LEN ${(ln / clip.rate).toFixed(1)}s</span>
       <button class="spd-btn" data-c="nleft" data-id="${clip.id}">◄</button>
       <button class="spd-btn" data-c="nright" data-id="${clip.id}">►</button>
     </div>
@@ -1990,8 +2211,8 @@ function renderMixerEditor() {
   const px = mixPx();
   let maxEnd = 16;
   state.mixer.clips.forEach(c => {
-    const tr = trackById(c.trackId);
-    if (tr) { const { so, ln } = clipSrc(c, tr); const end = c.start + ln / c.rate; if (end > maxEnd) maxEnd = end; }
+    const tr = findTrack(c.trackId);
+    if (tr) { const { ln } = clipSrc(c, tr); const end = c.start + ln / c.rate; if (end > maxEnd) maxEnd = end; }
   });
   maxEnd = Math.ceil(maxEnd) + 8;
   wrap.style.width = (maxEnd * px + MIX_LABEL_W + 20) + 'px';
@@ -2039,7 +2260,7 @@ function renderMixerEditor() {
     wrap.appendChild(row);
   });
   state.mixer.clips.forEach(clip => {
-    const tr = trackById(clip.trackId);
+    const tr = findTrack(clip.trackId);
     if (!tr) return;
     const li = layers.findIndex(l => l.id === clip.layerId);
     if (li < 0) return;
@@ -2048,11 +2269,11 @@ function renderMixerEditor() {
     if (!cont) return;
     const { ln } = clipSrc(clip, tr);
     const el = document.createElement('div');
-    el.className = 'mix-clip' + (state.mixer.selectedClipId === clip.id ? ' selclip' : '') + (state.selectedClipIds.has(clip.id) ? ' selmarked' : '');
+    el.className = 'mix-clip' + (clip.voice ? ' voiceclip' : '') + (state.mixer.selectedClipId === clip.id ? ' selclip' : '') + (state.selectedClipIds.has(clip.id) ? ' selmarked' : '');
     el.style.left = (clip.start * px) + 'px';
     el.style.width = Math.max(26, (ln / clip.rate) * px - 2) + 'px';
     el.style.background = `linear-gradient(135deg, ${layers[li].color}, ${shadeColor(layers[li].color, -25)})`;
-    el.innerHTML = `<span>${tr.name}</span><em>${clip.rate}× · ${Math.round(clip.volume * 100)}% · ${ln.toFixed(1)}s</em>
+    el.innerHTML = `<span>${tr.kind === 'voice' ? '🎤 ' : tr.kind === 'upload' ? '📁 ' : ''}${tr.name}</span><em>${clip.rate}× · ${Math.round(clip.volume * 100)}% · ${(ln / clip.rate).toFixed(1)}s</em>
       <div class="rz rz-l"></div><div class="rz rz-r"></div>`;
     attachClipDrag(el, clip);
     attachClipResize(el, clip, 'l');
@@ -2127,12 +2348,12 @@ function attachClipResize(el, clip, side) {
     e.preventDefault(); e.stopPropagation();
     h.setPointerCapture(e.pointerId);
     const sx = e.clientX;
-    const tr = trackById(clip.trackId);
+    const tr = findTrack(clip.trackId);
     if (!tr) return;
     const px = mixPx();
     const oStart = clip.start;
     const oSo = clip.srcOffset || 0;
-    const oLen = (clip.len != null ? clip.len : tr.duration - oSo);
+    const oLen = (clip.len != null ? clip.len : tr.duration);
     const move = (ev) => {
       const dx = ev.clientX - sx;
       if (side === 'r') {
@@ -2150,7 +2371,7 @@ function attachClipResize(el, clip, side) {
       el.style.width = Math.max(26, (clip.len / clip.rate) * px - 2) + 'px';
       if (side === 'l') el.style.left = (clip.start * px) + 'px';
       const em = el.querySelector('em');
-      if (em) em.textContent = `${clip.rate}× · ${Math.round(clip.volume * 100)}% · ${clip.len.toFixed(1)}s`;
+      if (em) em.textContent = `${clip.rate}× · ${Math.round(clip.volume * 100)}% · ${(clip.len / clip.rate).toFixed(1)}s`;
     };
     const up = () => {
       h.releasePointerCapture(e.pointerId);
@@ -2158,7 +2379,7 @@ function attachClipResize(el, clip, side) {
       h.removeEventListener('pointerup', up);
       h.removeEventListener('pointercancel', up);
       renderMixerEditor(); renderMixerControls(); refreshTransport();
-      toast(side === 'l' ? `◧ left-trim · starts +${(clip.srcOffset || 0).toFixed(1)}s · len ${clip.len.toFixed(1)}s` : `◨ length ${clip.len.toFixed(1)}s`, 'success');
+      toast(side === 'l' ? `◧ left-trim · starts +${(clip.srcOffset || 0).toFixed(1)}s` : `◨ length ${(clip.len / clip.rate).toFixed(1)}s`, 'success');
     };
     h.addEventListener('pointermove', move);
     h.addEventListener('pointerup', up);
@@ -2172,7 +2393,7 @@ function updateMixRepeatBtn() {
 }
 
 /* ============ OFFLINE RENDER ============ */
-function renderOffline(durSec, fill) {
+async function renderOffline(durSec, fill) {
   const sr = 44100;
   const OC = window.OfflineAudioContext || window.webkitOfflineAudioContext;
   if (!OC) return Promise.reject(new Error('no offline audio'));
@@ -2181,18 +2402,30 @@ function renderOffline(durSec, fill) {
   const comp = oc.createDynamicsCompressor();
   comp.threshold.value = -8; comp.ratio.value = 4;
   om.connect(comp); comp.connect(oc.destination);
-  fill(oc, om);
+  await fill(oc, om);
   return oc.startRendering();
 }
-function fillClips(oc, om, pairs) {
-  pairs.forEach(({ c, tr }) => {
+async function fillClips(oc, om, pairs) {
+  for (const { c, tr } of pairs) {
     const g = oc.createGain(); g.gain.value = c.volume; g.connect(om);
-    const { so, ln } = clipSrc(c, tr);
-    tr.events.forEach(ev => {
-      if (ev.t < so || ev.t >= so + ln) return;
-      playSound(ev.instrument, ev.midi, ev.note, ev.dur / c.rate, oc, c.start + (ev.t - so) / c.rate, g, null);
-    });
-  });
+    if (isAudioTrack(tr)) {
+      try {
+        const buf = await ensureVoiceBuffer(tr, oc);
+        const src = oc.createBufferSource();
+        src.buffer = buf; src.playbackRate.value = c.rate;
+        const so = Math.min(c.srcOffset || 0, Math.max(0, buf.duration - 0.05));
+        const durSrc = Math.max(0.05, Math.min(c.len, buf.duration - so));
+        src.connect(g);
+        src.start(c.start, so, durSrc);
+      } catch (e) {}
+    } else {
+      const { so, ln } = clipSrc(c, tr);
+      (tr.events || []).forEach(ev => {
+        if (ev.t < so || ev.t >= so + ln) return;
+        playSound(ev.instrument, ev.midi, ev.note, ev.dur / c.rate, oc, c.start + (ev.t - so) / c.rate, g, null);
+      });
+    }
+  }
 }
 function fillLayers(oc, om) {
   const layers = getSelectedLayers().length ? getSelectedLayers() : state.layers.filter(l => !l.muted);
@@ -2204,7 +2437,7 @@ function fillLayers(oc, om) {
   });
 }
 function fillTrack(oc, om, tr) {
-  tr.events.forEach(ev => playSound(ev.instrument, ev.midi, ev.note, ev.dur, oc, ev.t, om, null));
+  (tr.events || []).forEach(ev => playSound(ev.instrument, ev.midi, ev.note, ev.dur, oc, ev.t, om, null));
 }
 function renderClipsBuffer(pairs, dur) { return renderOffline(dur + 1.5, (oc, om) => fillClips(oc, om, pairs)); }
 function renderLayersBuffer() { const beatDur = getBeatDur(); return renderOffline(getMaxPosition() * beatDur + 2, fillLayers); }
@@ -2511,7 +2744,7 @@ function applyProject(p) {
   if (state.mixer.layers.length === 0) createMixLayer();
   const al = getActiveLayer();
   if (al) state.currentInstrument = al.instrument;
-  renderLayers(); renderTimeline(); renderTracks(); renderMixerLayers(); renderMixerEditor(); renderMixerControls();
+  renderLayers(); renderTimeline(); renderTracks(); renderVoiceList(); renderMixerLayers(); renderMixerEditor(); renderMixerControls();
   updateInstrumentUI(); updateInfoLabels(); updateCursor();
   if (state.sizeMode === 'small') applySize('small'); else renderKeyboard();
   refreshTransport();
@@ -2806,6 +3039,13 @@ function bindEvents() {
     updateCursor(); renderLayers(); renderTimeline(); updateInfoLabels();
   };
   $('sessionRecBtn').onclick = () => state.session.recording ? stopSession() : startSession();
+  $('voiceRecBtn').onclick = () => toggleVoiceRec();
+  $('uploadBox').onclick = () => $('audioFile').click();
+  $('audioFile').onchange = (e) => {
+    const f = e.target.files && e.target.files[0];
+    handleAudioUpload(f);
+    e.target.value = '';
+  };
   $('addMixLayerBtn').onclick = () => { createMixLayer(); toast('Mix layer added', 'success'); };
   $('mixRepeatBtn').onclick = () => {
     state.mixer.repeat = !state.mixer.repeat;
@@ -2909,7 +3149,7 @@ function init() {
   createMixLayer('Mix A');
   createMixLayer('Mix B');
   createMixLayer('Mix C');
-  renderLayers(); renderKeyboard(); renderTimeline(); renderTracks();
+  renderLayers(); renderKeyboard(); renderTimeline(); renderTracks(); renderVoiceList();
   renderMixerLayers(); renderMixerEditor(); renderMixerControls();
   updateInstrumentUI(); updateInfoLabels(); updateMixRepeatBtn();
   $('mixZoomLabel').textContent = mixPx() + 'px/s';
@@ -2919,7 +3159,7 @@ function init() {
   renderVault(); renderProjects();
   updateCtxChip(); refreshTransport();
   detectContext();
-  toast('◆ MIX FIXED — clips now play live, loop ∞, stop instantly', 'success');
+  toast('◆ Uploads 📁 + fixed mic 🎤 — mix voice & files with beats', 'success');
 }
 init();
 </script>
