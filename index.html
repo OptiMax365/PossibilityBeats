@@ -366,7 +366,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
   </div>
   <div class="transport-scroll">
     <div class="transport-bar">
-      <span class="brand-mini">◆ ROBOT BEATS MAKINGS</span>
+      <span class="brand-mini">ROBOT BEATS MAKINGS</span>
       <span class="ctx-chip" id="ctxChip" data-ctx="beats">● BEATS EDITOR</span>
       <button class="tbtn" id="playBtn" title="Play (context aware)">▶</button>
       <button class="tbtn stopbtn" id="stopBtn" title="Stop all">⏹</button>
@@ -393,7 +393,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 <main>
   <section class="section" data-ctx="beats">
     <div class="section-header">
-      <h2>◆ SOUND TYPES</h2>
+      <h2>SOUND TYPES</h2>
       <span class="layer-pos" id="currentInstLabel">IVORY</span>
     </div>
     <div class="instrument-scroll" id="instrumentScroll"></div>
@@ -401,7 +401,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="beats">
     <div class="section-header">
-      <h2>◆ LAYERS</h2>
+      <h2>LAYERS</h2>
       <div class="header-actions">
         <button class="mini-btn" id="selectAllBtn">SELECT ALL</button>
         <button class="mini-btn" id="addLayerBtn">+ ADD</button>
@@ -420,7 +420,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="beats" style="padding: 10px;">
     <div class="section-header">
-      <h2>◆ KEYBOARD SYSTEM</h2>
+      <h2>KEYBOARD SYSTEM</h2>
       <span class="layer-pos" id="octaveLabel">1 UNIT</span>
     </div>
     <div class="kb-info">
@@ -451,7 +451,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="beats" style="padding: 10px;">
     <div class="section-header">
-      <h2>◆ BEAT TIMELINE</h2>
+      <h2>BEAT TIMELINE</h2>
       <span class="layer-pos" id="beatCountLabel">0 NOTES</span>
     </div>
     <div class="timeline-wrapper">
@@ -469,7 +469,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="session">
     <div class="section-header">
-      <h2>◆ SESSION RECORDER</h2>
+      <h2>SESSION RECORDER</h2>
       <span class="rec-elapsed" id="recElapsed">0:00.0</span>
     </div>
     <button class="rec-session-btn" id="sessionRecBtn">● CLICK TO RECORD SESSION — plays back exactly as you play</button>
@@ -478,7 +478,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="session">
     <div class="section-header">
-      <h2>◆ VOICE RECORD & UPLOADS</h2>
+      <h2>VOICE RECORD & UPLOADS</h2>
       <span class="rec-elapsed" id="voiceElapsed">0:00.0</span>
     </div>
     <button class="rec-session-btn voice" id="voiceRecBtn">🎤 CLICK TO RECORD VOICE — beats keep playing</button>
@@ -494,7 +494,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="mixer">
     <div class="section-header">
-      <h2>◆ MIXER — DRAG · RESIZE · REMIX</h2>
+      <h2>MIXER — DRAG · RESIZE · REMIX</h2>
       <div class="header-actions">
         <button class="mini-btn" id="addMixLayerBtn">+ LAYER</button>
         <button class="mini-btn on" id="mixRepeatBtn">↻ REPEAT ON</button>
@@ -519,7 +519,7 @@ main { padding: 10px; display: flex; flex-direction: column; gap: 12px; position
 
   <section class="section" data-ctx="vault">
     <div class="section-header">
-      <h2>◆ PRODUCED MIXES & PROJECT VAULT</h2>
+      <h2>PRODUCED MIXES & PROJECT VAULT</h2>
     </div>
     <div class="layer-list" id="mixVaultList"></div>
     <div class="layer-controls-row">
@@ -1155,7 +1155,7 @@ function bindNotesPanel() {
   $('npAuto').onclick = () => {
     state.notes.auto = !state.notes.auto;
     saveNotes(); renderNotesPanel();
-    toast(state.notes.auto ? '📝 AUTO-NOTE ON — writes as you play' : '📝 AUTO-NOTE OFF — manual only', state.notes.auto ? 'success' : '');
+    toast(state.notes.auto ? ' AUTO-NOTE ON — writes as you play' : '📝 AUTO-NOTE OFF — manual only', state.notes.auto ? 'success' : '');
   };
   $('npNew').onclick = () => {
     const n = { id: state.notes.nextId++, title: 'Note ' + (state.notes.list.length + 1), text: '', created: Date.now() };
@@ -1886,14 +1886,12 @@ function showMicBlocked() {
   });
 }
 async function requestMic() {
-  /* legacy fallback for old webviews */
   if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
     if (navigator.getUserMedia) {
       return new Promise((res, rej) => navigator.getUserMedia({ audio: true }, res, rej));
     }
     throw new Error('NO_MEDIA_API');
   }
-  /* auto-prompt permission; if previously denied, guide the user */
   try {
     if (navigator.permissions && navigator.permissions.query) {
       const st = await navigator.permissions.query({ name: 'microphone' }).catch(() => null);
@@ -1916,7 +1914,7 @@ async function toggleVoiceRec() {
     return;
   }
   try {
-    initAudio(); resumeCtx();   /* beats keep playing — we do NOT stop playback */
+    initAudio(); resumeCtx();
     const rec = new MediaRecorder(stream);
     voiceRec = { active: true, rec, chunks: [], t0: performance.now(), timer: null, stream };
     rec.ondataavailable = (e) => { if (e.data && e.data.size) voiceRec.chunks.push(e.data); };
@@ -3159,7 +3157,7 @@ function init() {
   renderVault(); renderProjects();
   updateCtxChip(); refreshTransport();
   detectContext();
-  toast('◆ Uploads 📁 + fixed mic 🎤 — mix voice & files with beats', 'success');
+  toast('ROBOT BEATS MAKINGS ready — no external brand icons', 'success');
 }
 init();
 </script>
